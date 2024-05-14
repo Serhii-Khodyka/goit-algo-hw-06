@@ -118,20 +118,40 @@ bfs_path = bfs_paths(G, start_city)
 print(bfs_path)
 
 # Алгоритм Дейкстри
-def dijkstra_shortest_path(graph, start, end):
-    shortest_paths = nx.shortest_path(graph, source=start, target=end, weight="weight")
-    shortest_distance = nx.shortest_path_length(graph, source=start, target=end, weight="weight")
-    return shortest_paths, shortest_distance
+def dijkstra(graph, start, end):
+     # Ініціалізація відстаней та множини невідвіданих вершин
+    distances = {vertex: float('infinity') for vertex in graph}
+    distances[start] = 0
+    unvisited = list(graph.nodes())
 
-start_city = "Хмельницький"
-end_city = "Тернопіль"
+    while unvisited:
+        # Знаходження вершини з найменшою відстанню серед невідвіданих
+        current_vertex = min(unvisited, key=lambda vertex: distances[vertex])
 
-shortest_paths, shortest_distance = dijkstra_shortest_path(G, start_city, end_city)
+        # Якщо поточна відстань є нескінченністю, то ми завершили роботу
+        if distances[current_vertex] == float('infinity'):
+            break
 
-# Виведемо результати
-print(f"\nНайкоротший шлях з {start_city} до {end_city}:")
-print(shortest_paths)
-print(f"Найкоротша відстань: {shortest_distance} км")
+        for neighbor in graph.neighbors(current_vertex):
+            distance = distances[current_vertex] + graph.edges[current_vertex, neighbor]["distance_km"]
+
+            # Якщо нова відстань коротша, то оновлюємо найкоротший шлях
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+
+        # Видаляємо поточну вершину з множини невідвіданих
+        unvisited.remove(current_vertex)
+
+    return distances
+
+start_vertex  = "Хмельницький"
+end_vertex  = "Тернопіль"
+
+shortest_distances = dijkstra(G, start_vertex, end_vertex)
+
+# Виведення результату
+print(f"Найкоротший маршрут з {start_vertex} до {end_vertex}:")
+print(shortest_distances[end_vertex], "км")
 
 # Візуалізація графа
 plt.figure(figsize=(45, 25))
